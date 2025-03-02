@@ -17,6 +17,7 @@ class SearchResult(BaseModel):
 
 ## 이거 자체가 1회
 def firecrawl_search(query: str, timeout: int = 15000, limit: int = 5) ->List[SearchResult]:
+    time.sleep(30)
     """
     Firecrawl 검색 API를 호출하여 결과를 반환하는 동기 함수.
     """
