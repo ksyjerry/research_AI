@@ -1,58 +1,34 @@
 # 파이썬으로 딥리서치 만들어보기
 
 
-참고 자료 : https://github.com/dzhng/deep-research
+* 참고 자료 : https://github.com/dzhng/deep-research
+기존 오픈소스 코드를 파이썬으로 변형하여 OpenAI의 Deep Research와 같은 심층적인 AI 에이전트 패턴을 파이썬으로 구현해보는 실습이다.
 
-
-OpenAI의 언어 모델을 활용하여 주제를 심층적으로 탐구하는 AI 기반 연구 도구입니다.
-
-## 설치
-
-```
+# 사전준비
+## 사전 준비
+1. [OpenAI 키 발급받기](https://github.com/dabidstudio/dabidstudio_guides/blob/main/get-openai-api-key.md)
+2. [Firecrawl API키 발급받기](https://www.firecrawl.dev/)
+3. [파이썬 가상환경 설정](https://github.com/dabidstudio/dabidstudio_guides/blob/main/python-set-venv.md)
+4. 가상환경 활성화 한 후 패키지 설치
+```bash
 pip install openai python-dotenv firecrawl-py
 ```
-
-## 프로젝트 구조
-
-```
-python_deepresearch/
-│
-├── main.py                    # 메인 진입점
-├── utils.py                   # 유틸리티 함수
-│
-├── step1_feedback/            # 1단계: 피드백 생성
-│   └── feedback.py            # 후속 질문 생성
-│
-├── step2_research/            # 2단계: 심층 연구
-│   └── research.py            # 심층 연구 수행
-│
-├── step3_reporting/           # 3단계: 최종 보고서
-│   └── reporting.py           # 최종 보고서 생성
-│
-└── output/                    # 생성된 보고서 저장 디렉토리
+5. .env 파일을 생성한 후 발급받은 API 키를 채워두기
+```bash
+OPENAI_API_KEY="OpenAI키"
+FIRECRAWL_API_KEY="Firecrawl키"
 ```
 
-## 사용법
+# 코드 실행해보기
+```
+python main.py
+```
 
-1. `.env` 파일을 생성하고 OpenAI API 키를 추가하세요:
-   ```
-   OPENAI_API_KEY=your_api_key_here
-   ```
+- 리서치 하고싶은 주제를 입력하면 맞춤형 리서치를 위한 후속 질문이 나와서 답변을 해줍니다.
+- 답변을 모두 완료하면 최종 보고서가 output 폴더에 저장됩니다.
 
-2. 메인 스크립트 실행:
-   ```
-   python main.py
-   ```
+# 유의사항
+- Firecrawl의 경우 무료사용자(Free Tier)는 특정 키워드로 검색을 하는 경우 5회/min 제한이 있음
+- 연구의 너비/깊이를 2/2로 해야 함 (이 이상으로 할 경우 1분 이상 기달려야 함)
 
-3. 프롬프트에 따라 연구 주제를 입력하고 후속 질문에 답변하세요.
-
-4. 최종 보고서는 `output` 디렉토리에 저장됩니다.
-
-
-rate limit 5이기 때문에 2/2밖에 안됨
-
-
-
-a -> a1/a2
-b -? b1/b2
 
