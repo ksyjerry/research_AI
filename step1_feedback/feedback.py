@@ -5,8 +5,10 @@ from pydantic import BaseModel
 class FeedbackResponse(BaseModel):
     questions: List[str]
 
-def generate_feedback(query: str, client, model: str, max_feedbacks: int = 5) -> List[str]:
-    """연구 방향을 명확히 하기 위한 후속 질문을 생성합니다."""
+
+"""연구 방향을 명확히 하기 위한 후속 질문을 생성합니다."""
+def generate_feedback(query: str, client, model: str, max_feedbacks: int = 3) -> List[str]:
+    
     prompt = f"""
     Given the following query from the user, ask some follow up questions to clarify the research direction. Return a maximum of ${max_feedbacks} questions, but feel free to return less if the original query is clear.
     ask the follow up questions in korean
@@ -21,14 +23,13 @@ def generate_feedback(query: str, client, model: str, max_feedbacks: int = 5) ->
     # )
 
     response = JSON_llm(prompt, FeedbackResponse, client, system_prompt=system_prompt(), model=model)
-    print("응답 결과:")
-    print(response)
+
     try:
         if response is None:
             print("오류: JSON_llm이 None을 반환했습니다.")
             return []
         questions = response.questions
-        print(f"쿼리 '{query}'에 대한 후속 질문 {len(questions)}개 생성됨")
+        print(f"주제 '{query}'에 대한 후속 질문 {len(questions)}개 생성됨")
         print(f"생성된 후속 질문: {questions}")
         return questions
     except Exception as e:
