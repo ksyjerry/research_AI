@@ -17,7 +17,6 @@ class SearchResult(BaseModel):
 
 ## 이거 자체가 1회
 def firecrawl_search(query: str, timeout: int = 15000, limit: int = 5) ->List[SearchResult]:
-    time.sleep(30)
     """
     Firecrawl 검색 API를 호출하여 결과를 반환하는 동기 함수.
     """
@@ -86,7 +85,7 @@ def process_serp_result(
     search_result: List[SearchResult],
     client,
     model: str,
-    num_learnings: int = 3,
+    num_learnings: int = 5,
     num_follow_up_questions: int = 3,
 ) -> Dict[str, List[str]]:
     """
@@ -95,7 +94,7 @@ def process_serp_result(
     """
     contents = [
         item.get("markdown", "").strip()[:25000]
-        for item in search_result["data"] if item.get("markdown")
+        for item in search_result if item.get("markdown")
     ]
     contents_str = "".join(f"<내용>\n{content}\n</내용>" for content in contents)
     prompt = (
@@ -127,7 +126,6 @@ def deep_research(
     model: str,
     learnings: Optional[List[str]] = None,
     visited_urls: Optional[List[str]] = None,
-    attempt: int = 1  # Added to track attempt index
 ) -> ResearchResult:
     """
     주제를 재귀적으로 탐색하여 SERP 쿼리를 생성하고, 검색 결과를 처리하며,
@@ -136,15 +134,17 @@ def deep_research(
     learnings = learnings or []
     visited_urls = visited_urls or []
 
-    print(f"Deep Research {attempt}차 시도 \n 주제 \n {query})")
+    print(f" ---------- Deep Research 시도 ------------------")
+    print(f" <주제> \n {query} \n </주제>")
 
     serp_queries = generate_serp_queries(query=query, client=client, model=model, num_queries=breadth, learnings=learnings)
-    
-    for index, serp_query in enumerate(serp_queries, start=1):
-        print(f"  - {attempt}.{index}번째 검색 쿼리: {serp_query.query}") 
+    print(f" ------------ 해당 <주제>에 대해서 생성된 검색 키워드 ({len(serp_queries)}개 생성)------------")
+    print(f" {serp_queries} \n")
 
-        result = firecrawl_search(serp_query.query)
-        new_urls = [item.get("url") for item in result["data"] if item.get("url")]
+    for index, serp_query in enumerate(serp_queries, start=1):
+
+        result : List[SearchResult] = firecrawl_search(serp_query.query)
+        new_urls = [item.get("url") for item in result if item.get("url")]
         serp_result = process_serp_result(
             query=serp_query.query,
             search_result=result,
@@ -152,6 +152,12 @@ def deep_research(
             model=model,
             num_follow_up_questions=breadth
         )
+        print(f"  - 의 {index}번째 검색 키워드 ({serp_query.query})에 대한 조사 완료") 
+        print(f"  - 조사완료된 URL들:")
+        for url in new_urls:
+            print(f"    • {url}")
+        print()
+        print(f"  - 조사로 얻은 학습 내용 ({len(serp_result['learnings'])}개 생성) : \n {serp_result['learnings']} \n")
 
         all_learnings = learnings + serp_result["learnings"]
         all_urls = visited_urls + new_urls
@@ -173,7 +179,6 @@ def deep_research(
                 model=model,
                 learnings=all_learnings,
                 visited_urls=all_urls,
-                attempt=attempt + 1  # 시도 횟수 증가
             )
 
             learnings = sub_result["learnings"]
