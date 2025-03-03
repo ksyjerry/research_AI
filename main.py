@@ -12,12 +12,12 @@ def main():
     query = input("어떤 주제에 대해 리서치하시겠습니까?: ")
 
     
-    # gpt 4o-mini 또는 gpt-4o로 변경 가능
+    # gpt 4o-mini, gpt-4o,o3-mini 로 변경 가능 (structured output 지원되는 모델만 가능 → o1-mini는 불가)
     feedback_model = "gpt-4o-mini"    
-    research_model = "o3-mini"
+    research_model = "gpt-4o"
     
-    # "o1-mini, gpt-4o, gpt-4o-mini"로 변경 가능 
-    reporting_model="o3-mini" 
+    # "o3-mini, gpt-4o, gpt-4o-mini"로 변경 가능 
+    reporting_model="o1-mini" 
     
     
     client = OpenAI()
