@@ -11,13 +11,20 @@ def main():
     # 사용자로부터 초기 연구 질문을 입력받음
     query = input("어떤 주제에 대해 리서치하시겠습니까?: ")
 
-    # LLM 클라이언트를 초기화하고 모델 설정
-    model = "gpt-4o-mini"
+    
+    # gpt 4o-mini 또는 gpt-4o로 변경 가능
+    feedback_model = "gpt-4o-mini"    
+    research_model = "o3-mini"
+    
+    # "o1-mini, gpt-4o, gpt-4o-mini"로 변경 가능 
+    reporting_model="o3-mini" 
+    
+    
     client = OpenAI()
 
     # 추가적인 질문을 생성하여 연구 방향을 구체화
-    print("\n추가 질문을 생성하는 중...")
-    feedback_questions = generate_feedback(query, client, model, max_feedbacks=3)
+    print(f"------------------------------------------1단계: 추가 질문 생성----------------------------------------------------")
+    feedback_questions = generate_feedback(query, client, feedback_model, max_feedbacks=3)
     answers = []
     if feedback_questions:
         print("\n다음 질문에 답변해 주세요:")
@@ -33,7 +40,7 @@ def main():
         combined_query += f"\n{i+1}. 질문: {feedback_questions[i]}\n"
         combined_query += f"   답변: {answers[i]}\n"
         
-    print("---------------------------최종 질문----------------------")
+    print("최종질문 : \n")
     print(combined_query)
 
     # 연구 범위 및 깊이를 사용자로부터 입력받음
@@ -47,13 +54,13 @@ def main():
         depth = 2
 
     # 심층 연구 수행 (동기적으로 실행)
-    print("\n연구를 수행하는 중...")
+    print(f"------------------------------------------2단계: 딥리서치----------------------------------------------------")
     research_results = deep_research(
         query=combined_query,
         breadth=breadth,
         depth=depth,
         client=client,
-        model=model
+        model=research_model
     )
 
     # 연구 결과 출력
@@ -62,14 +69,14 @@ def main():
         print(f" - {learning}")
 
     # 최종 보고서 생성
-    print("\n최종 보고서를 생성하는 중...")
-    model_for_reporting="o3-mini" ## "o1-mini 또는 gpt-4o-mini"로 변경 가능
+    print(f"------------------------------------------3단계: 보고서 작성----------------------------------------------------")
+
     report = write_final_report(
         prompt=combined_query,
         learnings=research_results["learnings"],
         visited_urls=research_results["visited_urls"],
         client=client,
-        model=model_for_reporting
+        model=reporting_model
     )
 
     # 최종 보고서 출력 및 파일 저장
