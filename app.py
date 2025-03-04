@@ -4,7 +4,6 @@ from openai import OpenAI
 from step1_feedback.feedback import generate_feedback
 from step2_research.research import deep_research
 from step3_reporting.reporting import write_final_report
-from dotenv import load_dotenv
 from PIL import Image
 import time
 from docx import Document
@@ -237,9 +236,6 @@ with col1:
 with col2:
     st.title("Research AI")
 st.markdown('</div>', unsafe_allow_html=True)
-
-# 환경 변수 로드
-load_dotenv()
 
 # OpenAI 클라이언트 초기화
 client = OpenAI()
