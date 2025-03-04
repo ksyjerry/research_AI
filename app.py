@@ -114,13 +114,6 @@ def create_word_document(report_text, query):
     title = doc.add_heading('리서치 AI 분석보고서', 0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
-    # 부제목 추가
-    subtitle = doc.add_paragraph('Developed by Assurance DA')
-    subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    subtitle.style.font.name = '맑은 고딕'
-    subtitle.style.font.size = Pt(11)
-    subtitle.style.font.bold = True
-    
     # 구분선 추가
     doc.add_paragraph('─' * 50).alignment = WD_ALIGN_PARAGRAPH.CENTER
     
