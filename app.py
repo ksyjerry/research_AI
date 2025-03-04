@@ -26,11 +26,17 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 0px;
     }
     .logo-title-container h1 {
         margin: 0;
         padding: 0;
+    }
+    .developer-text {
+        text-align: right;
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 20px;
     }
     .sidebar .stMarkdown {
         font-size: 0.9em;
@@ -105,15 +111,22 @@ def create_word_document(report_text, query):
     doc = Document()
     
     # 제목 스타일 설정
-    title = doc.add_heading('Research Report', 0)
+    title = doc.add_heading('리서치 AI 분석보고서', 0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
-    # 초기 질문 추가
-    doc.add_heading('초기 연구 질문', level=1)
-    doc.add_paragraph(query)
+    # 부제목 추가
+    subtitle = doc.add_paragraph('Developed by Assurance DA')
+    subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    subtitle.style.font.name = '맑은 고딕'
+    subtitle.style.font.size = Pt(11)
+    subtitle.style.font.bold = True
+    
+    # 구분선 추가
+    doc.add_paragraph('─' * 50).alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     # 보고서 내용 추가
-    doc.add_heading('연구 결과', level=1)
+    doc.add_heading('연구 주제', level=1)
+    doc.add_paragraph(query)
     
     # 마크다운 표 패턴 매칭을 위한 정규식
     table_pattern = r'\|([^\n]+)\|\n\|[-|]+\|\n(((?!\n\n|\n#).*\|\n)*)'
@@ -234,8 +247,12 @@ col1, col2 = st.columns([1, 8])
 with col1:
     st.image("PwC.jpg", width=80)
 with col2:
-    st.title("Research AI")
+    st.title("Research AI - Pilot")
+    # for Sustainability Report 를 작게 넣어보자
+    st.markdown('<div style="font-size: 1.5em;">for Sustainability Report</div>', unsafe_allow_html=True)
+    
 st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<div class="developer-text">Developed by Jaedong Kim(ASR DA)</div>', unsafe_allow_html=True)
 
 # OpenAI 클라이언트 초기화
 client = OpenAI()
