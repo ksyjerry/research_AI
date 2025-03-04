@@ -126,6 +126,7 @@ def deep_research(
     model: str,
     learnings: Optional[List[str]] = None,
     visited_urls: Optional[List[str]] = None,
+    callback: Optional[callable] = None,
 ) -> ResearchResult:
     """
     주제를 재귀적으로 탐색하여 SERP 쿼리를 생성하고, 검색 결과를 처리하며,
@@ -134,15 +135,22 @@ def deep_research(
     learnings = learnings or []
     visited_urls = visited_urls or []
 
-    print(f" ---------- Deep Research 시도 ------------------")
-    print(f" <주제> \n {query} \n </주제>")
+    message = f" ---------- Deep Research 시도 ------------------\n"
+    message += f" <주제> \n {query} \n </주제>"
+    if callback:
+        callback(message)
+    else:
+        print(message)
 
     serp_queries = generate_serp_queries(query=query, client=client, model=model, num_queries=breadth, learnings=learnings)
-    print(f" ------------ 해당 <주제>에 대해서 생성된 검색 키워드 ({len(serp_queries)}개 생성)------------")
-    print(f" {serp_queries} \n")
+    message = f" ------------ 해당 <주제>에 대해서 생성된 검색 키워드 ({len(serp_queries)}개 생성)------------\n"
+    message += f" {serp_queries} \n"
+    if callback:
+        callback(message)
+    else:
+        print(message)
 
     for index, serp_query in enumerate(serp_queries, start=1):
-
         result : List[SearchResult] = firecrawl_search(serp_query.query)
         new_urls = [item.get("url") for item in result if item.get("url")]
         serp_result = process_serp_result(
@@ -152,12 +160,17 @@ def deep_research(
             model=model,
             num_follow_up_questions=breadth
         )
-        print(f"  - 의 {index}번째 검색 키워드 ({serp_query.query})에 대한 조사 완료") 
-        print(f"  - 조사완료된 URL들:")
+        
+        message = f"  - 의 {index}번째 검색 키워드 ({serp_query.query})에 대한 조사 완료\n"
+        message += f"  - 조사완료된 URL들:\n"
         for url in new_urls:
-            print(f"    • {url}")
-        print()
-        print(f"  - 조사로 얻은 학습 내용 ({len(serp_result['learnings'])}개 생성) : \n {serp_result['learnings']} \n")
+            message += f"    • {url}\n"
+        message += f"\n  - 조사로 얻은 학습 내용 ({len(serp_result['learnings'])}개 생성) : \n {serp_result['learnings']} \n"
+        
+        if callback:
+            callback(message)
+        else:
+            print(message)
 
         all_learnings = learnings + serp_result["learnings"]
         all_urls = visited_urls + new_urls
@@ -179,6 +192,7 @@ def deep_research(
                 model=model,
                 learnings=all_learnings,
                 visited_urls=all_urls,
+                callback=callback
             )
 
             learnings = sub_result["learnings"]
@@ -187,5 +201,9 @@ def deep_research(
             learnings = all_learnings
             visited_urls = all_urls
 
-    return {"learnings": list(set(learnings)), "visited_urls": list(set(visited_urls))}
+    return {
+        "learnings": list(set(learnings)), 
+        "visited_urls": list(set(visited_urls)),
+        "serp_queries": serp_queries
+    }
 

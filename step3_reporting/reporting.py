@@ -9,26 +9,66 @@ def write_final_report(
     model: str,
 ) -> str:
     """
-    모든 연구 결과를 바탕으로 최종 보고서를 생성합니다.
-    llm_call을 사용하여 마크다운 보고서를 얻습니다.
+    수집된 정보를 바탕으로 최종 보고서를 작성합니다.
     """
-    learnings_string = ("\n".join([f"<learning>\n{learning}\n</learning>" for learning in learnings])).strip()[:150000]
+    prompt = f"""
+    다음은 연구 주제와 수집된 정보입니다. 이 정보를 바탕으로 구조화된 보고서를 작성해주세요.
 
-    user_prompt = (
-        f"사용자가 제시한 다음 프롬프트에 대해, 러서치 결과를 바탕으로 최종 보고서를 작성하세요. "
-        f"마크다운 형식으로 상세한 보고서(6,000자 이상)를 작성하세요. "
-        f"러서치에서 얻은 모든 학습 내용을 포함해야 합니다:\n\n"
-        f"<prompt>{prompt}</prompt>\n\n"
-        f"다음은 리서치를 통해 얻은 모든 학습 내용입니다:\n\n<learnings>\n{learnings_string}\n</learnings>"
+    <연구 주제>
+    {prompt}
+    </연구 주제>
+
+    <수집된 정보>
+    {chr(10).join(learnings)}
+    </수집된 정보>
+
+    <참조 URL>
+    {chr(10).join(visited_urls)}
+    </참조 URL>
+
+    보고서 작성 시 다음 지침을 따라주세요:
+
+    1. 보고서는 마크다운 형식으로 작성해주세요.
+    
+    2. 표 작성 시 다음 규칙을 반드시 준수해주세요:
+       - 각 열의 제목은 명확하고 간단하게 작성
+       - 모든 열은 왼쪽 정렬로 통일
+       - 구분선은 하이픈(-)만 사용하여 작성
+       - 표 예시:
+       | 구분 | 내용 | 비고 |
+       |------|------|------|
+       | 항목1 | 설명1 | 참고1 |
+       | 항목2 | 설명2 | 참고2 |
+
+    3. 다음과 같은 정보는 반드시 표로 작성해주세요:
+       - 단계별 정보나 프로세스
+       - 비교 데이터
+       - 시간순 정보
+       - 분류 정보
+       - 기준이나 조건
+       - 수치 데이터
+
+    4. 보고서 구조:
+       - 제목 (# 사용)
+       - 개요 (## 사용)
+       - 주요 내용 (### 사용, 표 형식 활용)
+       - 세부 분석 (### 사용)
+       - 결론 (## 사용)
+       - 참고 자료 (## 사용)
+
+    5. 표 작성 시 주의사항:
+       - 표의 각 열 너비는 내용에 맞게 설정
+       - 내용이 긴 경우 적절히 줄바꿈하여 작성
+       - 각 셀의 내용은 명확하고 간단하게 작성
+       - 복잡한 표는 여러 개의 작은 표로 분리
+    """
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "당신은 전문적인 연구 보고서 작성자입니다. 데이터를 명확하고 구조화된 방식으로 표현하는 것이 중요합니다. 특히 표 형식을 사용할 때는 마크다운 문법을 정확히 준수하여 표가 깨지지 않도록 작성해야 합니다."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    sys_prompt = system_prompt()
-    if sys_prompt:
-        user_prompt = f"{sys_prompt}\n\n{user_prompt}"
 
-    try:
-        report = llm_call(user_prompt, model, client)
-        urls_section = "\n\n## 출처\n\n" + "\n".join(f"- {url}" for url in visited_urls)
-        return report + urls_section
-    except Exception as e:
-        print(f"Error generating report: {e}")
-        return "Error generating report"
+    return response.choices[0].message.content

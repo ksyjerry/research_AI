@@ -31,4 +31,24 @@ python main.py
 - Firecrawl의 경우 무료사용자(Free Tier)는 특정 키워드로 검색을 하는 경우 5회/min 제한이 있음
 - 연구의 너비/깊이를 2/2로 해야 함 (이 이상으로 할 경우 1분 이상 기달려야 함)
 
+# Research AI
+
+## 환경 설정
+
+1. `.streamlit/secrets.toml.example` 파일을 `.streamlit/secrets.toml`로 복사합니다.
+2. `.streamlit/secrets.toml` 파일에 실제 API 키를 입력합니다:
+   ```toml
+   [openai]
+   OPENAI_API_KEY = "your-openai-api-key-here"
+
+   [firecrawl]
+   FIRECRAWL_API_KEY = "your-firecrawl-api-key-here"
+   ```
+
+## Streamlit Cloud 배포
+
+1. GitHub에 코드를 푸시합니다 (secrets.toml 파일은 제외됨).
+2. Streamlit Cloud에서 새 앱을 생성합니다.
+3. 앱 설정의 "Secrets" 섹션에 API 키를 추가합니다.
+
 

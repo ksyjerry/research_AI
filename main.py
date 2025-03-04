@@ -14,10 +14,10 @@ def main():
     
     # gpt 4o-mini, gpt-4o,o3-mini 로 변경 가능 (structured output 지원되는 모델만 가능 → o1-mini는 불가)
     feedback_model = "gpt-4o-mini"    
-    research_model = "gpt-4o"
+    research_model = "o3-mini"
     
     # "o3-mini, gpt-4o, gpt-4o-mini"로 변경 가능 
-    reporting_model="o1-mini" 
+    reporting_model="o3-mini" 
     
     
     client = OpenAI()
