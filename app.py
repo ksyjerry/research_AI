@@ -211,8 +211,10 @@ def create_word_document(report_text, query):
                         pos = text.find(url, start)
                         if pos > start:
                             p.add_run(text[start:pos]).font.name = '맑은 고딕'
-                        # URL을 하이퍼링크로 추가
-                        p.add_hyperlink(url, url, '0563C1')
+                        # URL을 텍스트로 추가
+                        run = p.add_run(url)
+                        run.font.name = '맑은 고딕'
+                        run.font.color.rgb = RGBColor(5, 99, 193)  # 파란색 링크 색상
                         start = pos + len(url)
                     # 남은 텍스트 추가
                     if start < len(text):
